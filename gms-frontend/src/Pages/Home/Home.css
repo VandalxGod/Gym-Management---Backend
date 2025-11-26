@@ -1,0 +1,13 @@
+.Bgphoto {
+    justify-content: center;
+    display: flex;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    /* overflow: hidden; */
+    background-size: cover;
+    background-image: url('..//..//src/assets/Discipline.jpeg');
+    height: 100vh;
+    
+  }
+  

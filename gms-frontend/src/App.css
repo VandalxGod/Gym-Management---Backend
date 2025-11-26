@@ -1,0 +1,18 @@
+.App{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.Bgphoto {
+  justify-content: center;
+  display: flex;
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat;
+  /* overflow: hidden; */
+  background-size: cover;
+  background-image: url('./assets/Discipline.jpeg');
+  height: 100vh;
+  
+}
