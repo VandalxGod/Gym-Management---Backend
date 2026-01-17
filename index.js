@@ -1,39 +1,52 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser');
-require('dotenv').config();
-const cors = require('cors');
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
+const cors = require("cors");
 
 const PORT = process.env.PORT || 4000;
 
-// ✅ PRODUCTION-SAFE CORS
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: true
-}));
+// ✅ Allowed origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://gym-management-djqs.onrender.com",
+];
 
-app.options("*", cors());
+// ✅ Single CORS options object (IMPORTANT)
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["set-cookie"],
+};
+
+
+// ✅ Apply CORS to ALL requests
+app.use(cors(corsOptions));
+
+// ✅ Explicitly handle preflight (THIS IS THE FIX)
+app.options("*", cors(corsOptions));
 
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
-// ✅ MongoDB Connection
-require('./DBConn/conn');
+// DB
+require("./DBConn/conn");
 
 // Routes
-const GymRoutes = require('./Routes/gym');
-const MembershipRoutes = require('./Routes/membership');
-const MemberRoutes = require('./Routes/member');
+app.use("/auth", require("./Routes/gym"));
+app.use("/plans", require("./Routes/membership"));
+app.use("/members", require("./Routes/member"));
 
-app.use('/auth', GymRoutes);
-app.use('/plans', MembershipRoutes);
-app.use('/members', MemberRoutes);
-
-app.get('/', (req, res) => {
-    res.send('Gym Management API is running!');
+app.get("/", (req, res) => {
+  res.send("Gym Management API is running!");
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

@@ -18,8 +18,13 @@ const auth = async (req, res, next) => {
         //     return res.status(401).json({ error: "Invalid token: Gym not found" });
         // }
         // // console.log("Cookies:", token);
-        req.gym = await Gym.findById(decoded.gym_id).select("-password");    
+        const gym = await Gym.findById(decoded.gym_id).select("-password");
+        if (!gym) {
+            return res.status(401).json({ error: "Gym not found" });
+        }
+        req.gym = gym;
         next();
+
     } catch (err) {
         console.log("Auth middleware error:", err);
         return res.status(401).json({ error: "Token is invalid or expired" });

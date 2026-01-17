@@ -121,7 +121,7 @@ exports.monthlyMember = async (req, res) => {
         }).sort({ createdAt: -1 });
         // console.log(startOfMonth,endOfMonth)
         res.status(200).json({
-            message: member.lenght ? "Fetched Members SuccessFully" : "No such Member Registered yet",
+            message: member.length ? "Fetched Members SuccessFully" : "No such Member Registered yet",
             members: member,
             totalMembers: member.length
         })
@@ -150,7 +150,7 @@ exports.expiringWithin3Days = async (req, res) => {
 
 
         res.status(200).json({
-            message: member.lenght ? "Fetched Members SuccessFully" : "No such Member is Expiring within 3 Days",
+            message: member.length ? "Fetched Members SuccessFully" : "No such Member is Expiring within 3 Days",
             members: member,
             totalMembers: member.length
         })
@@ -182,7 +182,7 @@ exports.expiringWithIn4to7Days = async (req, res) => {
         });
 
         res.status(200).json({
-            message: member.lenght ? "Fetched Members SuccessFully" : "No such Member is Expiring within 4-7 Days",
+            message: member.length ? "Fetched Members SuccessFully" : "No such Member is Expiring within 4-7 Days",
             members: member,
             totalMembers: member.length
         })
@@ -205,7 +205,7 @@ exports.expiredMember = async (req, res) => {
         });
 
         res.status(200).json({
-            message: member.lenght ? "Fetched Members SuccessFully" : "No such Member has been Expired",
+            message: member.length ? "Fetched Members SuccessFully" : "No such Member has been Expired",
             members: member,
             totalMembers: member.length
         })
