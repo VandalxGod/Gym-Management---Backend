@@ -34,27 +34,31 @@ exports.register = async (req, res) => {
         })
     }
 }
-
-const cookieOptions={
+const cookieOptions = {
     httpOnly: true,
-    secure: false,
-    sameSite:'Lax'
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None"
 };
+
 //This is the controller for gym login
 exports.login = async (req, res) => {
     try {
         const { userName, password } = req.body;
 
-        const gym = await Gym.findOne({ userName});
-        if (gym && await bcrypts.compare(password, gym.password))
-         {
+        const gym = await Gym.findOne({ userName });
+        if (gym && await bcrypts.compare(password, gym.password)) {
 
-            const token = jwt.sign({ gym_id: gym._id },process.env.JWT_SecretKey);
+            const token = jwt.sign(
+                { gym_id: gym._id },
+                process.env.JWT_SecretKey,
+                { expiresIn: "7d" }
+            );
+
             // console.log("jwtToken :",token);
-            res.cookie("cookie_token",token,cookieOptions)
+            res.cookie("cookie_token", token, cookieOptions)
 
 
-            res.json({ message: 'Logged is successfully', success: "true", gym,token});
+            res.json({ message: 'Logged is successfully', success: "true", gym, token });
         } else {
             res.status(400).json({ error: 'Invalid credentials' });
         }
@@ -122,11 +126,11 @@ exports.sendOtp = async (req, res) => {
 //This is the controller for checking otp
 exports.checkOtp = async (req, res) => {
     try {
-        const {email,otp} = req.body;
+        const { email, otp } = req.body;
         const gym = await Gym.findOne({
             email,
             resetPasswordToken: otp,
-            resetPasswordExpires: { $gt : Date.now() }
+            resetPasswordExpires: { $gt: Date.now() }
         });
 
 
@@ -134,9 +138,9 @@ exports.checkOtp = async (req, res) => {
             return res.status(400).json({ error: 'Otp is invalid or has expired' });
         }
         res.status(200).json({ message: 'OTP is Successfully Verified' });
-        
-            
-        
+
+
+
     } catch (err) {
         res.status(500).json({
             error: "Server Error"
@@ -175,8 +179,8 @@ exports.resetPassword = async (req, res) => {
 //     console.log(req.gym)
 // }
 
-exports.logout = async(req,res)=>{
-    res.clearCookie('cookie_token',cookieOptions).json({message: 'Logged out successfully'});
+exports.logout = async (req, res) => {
+    res.clearCookie('cookie_token', cookieOptions).json({ message: 'Logged out successfully' });
 }
 
 

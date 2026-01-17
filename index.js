@@ -4,25 +4,24 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const cors = require('cors');
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
+// ✅ PRODUCTION-SAFE CORS
 app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://gymfrontend-osur2advj-sumit-singhs-projects-051313b0.vercel.app"
-    ],
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
 
-// Enable preflight for all routes
 app.options("*", cors());
 
 app.use(cookieParser());
 app.use(express.json());
+
+// ✅ MongoDB Connection
 require('./DBConn/conn');
 
+// Routes
 const GymRoutes = require('./Routes/gym');
 const MembershipRoutes = require('./Routes/membership');
 const MemberRoutes = require('./Routes/member');
