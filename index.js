@@ -6,17 +6,24 @@ const cors = require("cors");
 
 const PORT = process.env.PORT || 4000;
 
-// ✅ Allowed origins
+// ✅ Allowed origins (VERY IMPORTANT)
 const allowedOrigins = [
   "http://localhost:5173",
   "https://gym-management-djqs.onrender.com",
+  "https://sumitweb.me",
+  "https://www.sumitweb.me",
 ];
 
-// ✅ Single CORS options object (IMPORTANT)
+// ✅ CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
+    // allow server-to-server or curl requests
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
@@ -25,20 +32,19 @@ const corsOptions = {
   exposedHeaders: ["set-cookie"],
 };
 
-
-// ✅ Apply CORS to ALL requests
+// ✅ Apply CORS to all routes
 app.use(cors(corsOptions));
 
-// ✅ Explicitly handle preflight (THIS IS THE FIX)
+// ✅ Handle preflight requests
 app.options("*", cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 
-// DB
+// ✅ Database connection
 require("./DBConn/conn");
 
-// Routes
+// ✅ Routes
 app.use("/auth", require("./Routes/gym"));
 app.use("/plans", require("./Routes/membership"));
 app.use("/members", require("./Routes/member"));
@@ -47,6 +53,7 @@ app.get("/", (req, res) => {
   res.send("Gym Management API is running!");
 });
 
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
