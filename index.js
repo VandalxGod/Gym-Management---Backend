@@ -1,45 +1,53 @@
 const express = require("express");
-const app = express();
-const cookieParser = require("cookie-parser");
-require("dotenv").config();
 const cors = require("cors");
+require("dotenv").config();
 
+const app = express();
 const PORT = process.env.PORT || 4000;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://gym-management-djqs.onrender.com",
-  "https://sumitweb.me",
-  "https://www.sumitweb.me"
-];
+/* =========================
+   MIDDLEWARE
+========================= */
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
-app.use(cookieParser());
+// Parse JSON
 app.use(express.json({ limit: "10mb" }));
 
+// ✅ CORS – JWT DOES NOT NEED credentials:true
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://gym-management-djqs.onrender.com",
+      "https://sumitweb.me",
+      "https://www.sumitweb.me",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+/* =========================
+   DATABASE CONNECTION
+========================= */
 require("./DBConn/conn");
 
+/* =========================
+   ROUTES
+========================= */
 app.use("/auth", require("./Routes/gym"));
 app.use("/plans", require("./Routes/membership"));
 app.use("/members", require("./Routes/member"));
 
+/* =========================
+   HEALTH CHECK
+========================= */
 app.get("/", (req, res) => {
-  res.send("Gym Management API is running!");
+  res.send("✅ Gym Management API is running");
 });
 
+/* =========================
+   SERVER START
+========================= */
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
