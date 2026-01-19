@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();
@@ -12,19 +13,35 @@ const PORT = process.env.PORT || 4000;
 // Parse JSON
 app.use(express.json({ limit: "10mb" }));
 
-// ✅ CORS – JWT DOES NOT NEED credentials:true
+// Parse cookies (IMPORTANT for auth)
+app.use(cookieParser());
+
+// ✅ CORS CONFIG (FINAL, SAFE)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://gym-management-djqs.onrender.com",
+  "https://gym.sumitweb.me",
+  "https://sumitweb.me",
+  "https://www.sumitweb.me",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://gym-management-djqs.onrender.com",
-      "https://sumitweb.me",
-      "https://www.sumitweb.me",
-    ],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow server-to-server
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true, // 🔥 REQUIRED for cookies
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
 
 /* =========================
    DATABASE CONNECTION
